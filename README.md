@@ -1,5 +1,7 @@
 # Phobos Motion
 
+![Teaser](assets/teaser.gif)
+
 This repo provides code snippets to animate robots imported with [Phobos](https://github.com/dfki-ric/phobos) in Blender. It uses Phobos 2.0.0 (Perilled Pangolin) and is compatible with Blender 3.x.
 
 ## Usage

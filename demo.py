@@ -45,6 +45,33 @@ def set_pose(modelname: str, p: list, r: list, pose_dict: dict, rotation_mode="X
     if isinstance(keyframe, int) and keyframe > 0:
         root.keyframe_insert(data_path='location', frame=keyframe)
         root.keyframe_insert(data_path='rotation_euler', frame=keyframe)
+
+def get_pose(modelname: str):
+    root = sUtils.getModelRoot(modelname)
+    if not root:
+        logging.error(f"No model found with the name {modelname}")
+        return
+    if bpy.context.mode != 'OBJECT':
+        bpy.ops.object.mode_set(mode='OBJECT')
+    # Unhide all links from viewport
+    
+    p = root.location
+    r = root.rotation_euler
+    q = {}
+    
+    # bpy.ops.object.select_all(action='SELECT')
+    links = sUtils.getChildren(root, ('link',), False, True)
+    sUtils.selectObjects([root] + links, clear=True, active=0)
+    bpy.ops.object.mode_set(mode='POSE')
+    for link in (link for link in links if 'joint/type' in link and link['joint/type'] not in ['fixed', 'floating']):
+        if link["joint/type"] == "prismatic":
+            q[link.name] = link.pose.bones['Bone'].location.y
+        else:
+            q[link.name] = link.pose.bones['Bone'].rotation_euler.y
+           
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+    return p, r, q
     
 # Creating robots from the given API has bugs. Use the template .blend file instead.
 # robot = phobos.core.Robot(inputfile="data/urdf/shadow_hand_description/shadowhand.urdf")
